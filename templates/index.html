@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Personal Assistant with Task Scheduler and Voice Assistance</title>
+</head>
+<body>
+    <h1>AI Personal Assistant with Task Scheduler and Voice Assistance</h1>
+    <h2>Text-based Task Management</h2>
+    
+    <form method="POST">
+        <input type="text" name="task" placeholder="Enter a task" required>
+        <input type="date" name="due_date">
+        <select name="priority">
+            <option value="Low">Low</option>
+            <option value="Medium">Medium</option>
+            <option value="High">High</option>
+        </select>
+        <button type="submit" name="add_task">Add Task</button>
+    </form>
+    
+    <h2>Tasks List</h2>
+    <ul>
+        {% for task in tasks %}
+        <li>ID: {{ task[0] }}, Task: {{ task[1] }}, Due Date: {{ task[2] }}, Priority: {{ task[3] }}, Status: {{ task[4] }}</li>
+        {% endfor %}
+    </ul>
+    
+    <h2>Delete Task</h2>
+    <form method="POST">
+        <input type="text" name="task_id" placeholder="Enter Task ID to delete" required>
+        <button type="submit" name="delete_task">Delete Task</button>
+    </form>
+    
+    <h2>Complete Task</h2>
+    <form method="POST">
+        <input type="text" name="task_id" placeholder="Enter Task ID to complete" required>
+        <button type="submit" name="complete_task">Complete Task</button>
+    </form>
+    
+    <a href="{{ url_for('voice') }}">Voice-Assisted Task Management</a>
+</body>
+</html>

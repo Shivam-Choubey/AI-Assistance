@@ -1,4 +1,9 @@
 import sqlite3
+import speech_recognition as sr
+import pyttsx3
+
+# Initialize text-to-speech engine
+engine = pyttsx3.init()
 
 # Function to create the tasks table if it doesn't exist
 def create_tasks_table():
@@ -17,13 +22,33 @@ def create_tasks_table():
     conn.commit()
     conn.close()
 
-# Function to add a task without scheduling details
-def add_task(task):
+# Function to recreate the tasks table with updated schema
+def recreate_tasks_table():
     conn = sqlite3.connect('task_manager.db')
     c = conn.cursor()
 
-    # Insert a new task into the tasks table without due date or priority
-    c.execute('INSERT INTO tasks (task) VALUES (?)', (task,))
+    # Create a new table with the correct schema
+    c.execute('''
+    CREATE TABLE IF NOT EXISTS new_tasks (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        task TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'pending',
+        due_date TEXT,
+        priority TEXT
+    )
+    ''')
+
+    # Copy data from old table to new table, if it exists
+    c.execute('''
+    INSERT INTO new_tasks (id, task, status, due_date, priority)
+    SELECT id, task, status, due_date, priority FROM tasks
+    ''')
+    
+    # Drop the old table
+    c.execute('DROP TABLE tasks')
+    
+    # Rename new table to old table name
+    c.execute('ALTER TABLE new_tasks RENAME TO tasks')
     
     conn.commit()
     conn.close()
@@ -38,6 +63,7 @@ def add_task_with_schedule(task, due_date, priority):
     
     conn.commit()
     conn.close()
+    speak_text(f"Task '{task}' added with due date {due_date} and priority {priority}.")
 
 # Function to view all tasks
 def view_tasks():
@@ -45,7 +71,7 @@ def view_tasks():
     c = conn.cursor()
 
     # Fetch all tasks
-    c.execute('SELECT id, task, status FROM tasks')
+    c.execute('SELECT id, task FROM tasks')
     tasks = c.fetchall()
     
     conn.close()
@@ -75,6 +101,7 @@ def delete_task(task_id):
     
     conn.commit()
     conn.close()
+    speak_text(f"Task with ID {task_id} deleted.")
 
 # Function to mark a task as complete
 def complete_task(task_id):
@@ -86,3 +113,34 @@ def complete_task(task_id):
     
     conn.commit()
     conn.close()
+    speak_text(f"Task with ID {task_id} marked as completed.")
+
+# Voice recognition for capturing tasks and commands
+def recognize_speech():
+    recognizer = sr.Recognizer()
+    with sr.Microphone() as source:
+        print("Listening...")
+        speak_text("Listening...")
+        recognizer.adjust_for_ambient_noise(source)
+        audio = recognizer.listen(source)
+
+        try:
+            command = recognizer.recognize_google(audio)
+            print(f"Recognized: {command}")
+            return command.lower()
+        except sr.UnknownValueError:
+            print("Sorry, I couldn't understand that.")
+            speak_text("Sorry, I couldn't understand that.")
+            return None
+        except sr.RequestError:
+            print("Error connecting to Google API.")
+            speak_text("Error connecting to Google API.")
+            return None
+
+# Text-to-speech function
+def speak_text(text):
+    engine.say(text)
+    engine.runAndWait()
+
+# Ensure to recreate the tasks table with the new schema
+recreate_tasks_table()
