@@ -1,5 +1,6 @@
 import speech_recognition as sr
 import pyttsx3
+import pyaudio
 
 # Initialize text-to-speech engine once
 engine = pyttsx3.init()

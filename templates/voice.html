@@ -1,32 +1,20 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-    <title>Voice-Assisted Task Management</title>
+    <meta charset="utf-8">
+    <title>Voice Commands</title>
 </head>
 <body>
-    <h1>Voice-Assisted Task Management</h1>
-    
-    <h2>Add Task via Voice</h2>
-    <form method="POST">
-        <input type="date" name="due_date">
-        <select name="priority">
-            <option value="Low">Low</option>
-            <option value="Medium">Medium</option>
-            <option value="High">High</option>
-        </select>
+    <h1>Voice Commands</h1>
+    <form action="{{ url_for('voice') }}" method="post">
         <button type="submit" name="add_task">Add Task via Voice</button>
     </form>
-    
-    <h2>Complete Task via Voice</h2>
-    <form method="POST">
+    <form action="{{ url_for('voice') }}" method="post">
         <button type="submit" name="complete_task">Complete Task via Voice</button>
     </form>
-    
-    <h2>Delete Task via Voice</h2>
-    <form method="POST">
+    <form action="{{ url_for('voice') }}" method="post">
         <button type="submit" name="delete_task">Delete Task via Voice</button>
     </form>
-    
-    <a href="{{ url_for('index') }}">Back to Task Management</a>
+    <a href="{{ url_for('index') }}">Back to Task Manager</a>
 </body>
 </html>

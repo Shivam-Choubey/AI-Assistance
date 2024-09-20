@@ -1,14 +1,23 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, jsonify
 import sqlite3
 import pyttsx3
 import speech_recognition as sr
 from datetime import datetime
+import threading
 
-# Initialize Flask app
 app = Flask(__name__)
 
 # Initialize text-to-speech engine
 engine = pyttsx3.init()
+
+def speak_text(text):
+    def run_speech():
+        engine.say(text)
+        engine.runAndWait()
+
+    # Run speech in a separate thread
+    thread = threading.Thread(target=run_speech)
+    thread.start()
 
 def create_tasks_table():
     conn = sqlite3.connect('task_manager.db')
@@ -74,10 +83,6 @@ def recognize_speech():
             print("Error connecting to Google API.")
             speak_text("Error connecting to Google API.")
             return None
-
-def speak_text(text):
-    engine.say(text)
-    engine.runAndWait()
 
 # Create tasks table if it doesn't exist
 create_tasks_table()

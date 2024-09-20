@@ -1,42 +1,32 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-    <title>AI Personal Assistant with Task Scheduler and Voice Assistance</title>
+    <meta charset="utf-8">
+    <title>Task Manager</title>
 </head>
 <body>
-    <h1>AI Personal Assistant with Task Scheduler and Voice Assistance</h1>
-    <h2>Text-based Task Management</h2>
-    
-    <form method="POST">
-        <input type="text" name="task" placeholder="Enter a task" required>
-        <input type="date" name="due_date">
-        <select name="priority">
-            <option value="Low">Low</option>
-            <option value="Medium">Medium</option>
-            <option value="High">High</option>
-        </select>
+    <h1>Task Manager</h1>
+    <form action="{{ url_for('index') }}" method="post">
+        <input type="text" name="task" placeholder="New task" required>
+        <input type="text" name="due_date" placeholder="Due date">
+        <input type="text" name="priority" placeholder="Priority">
         <button type="submit" name="add_task">Add Task</button>
     </form>
-    
-    <h2>Tasks List</h2>
     <ul>
         {% for task in tasks %}
-        <li>ID: {{ task[0] }}, Task: {{ task[1] }}, Due Date: {{ task[2] }}, Priority: {{ task[3] }}, Status: {{ task[4] }}</li>
+            <li>
+                {{ task[1] }} (Due: {{ task[2] }}, Priority: {{ task[3] }}) - {{ task[4] }}
+                <form action="{{ url_for('index') }}" method="post" style="display:inline;">
+                    <input type="hidden" name="task_id" value="{{ task[0] }}">
+                    <button type="submit" name="delete_task">Delete</button>
+                </form>
+                <form action="{{ url_for('index') }}" method="post" style="display:inline;">
+                    <input type="hidden" name="task_id" value="{{ task[0] }}">
+                    <button type="submit" name="complete_task">Complete</button>
+                </form>
+            </li>
         {% endfor %}
     </ul>
-    
-    <h2>Delete Task</h2>
-    <form method="POST">
-        <input type="text" name="task_id" placeholder="Enter Task ID to delete" required>
-        <button type="submit" name="delete_task">Delete Task</button>
-    </form>
-    
-    <h2>Complete Task</h2>
-    <form method="POST">
-        <input type="text" name="task_id" placeholder="Enter Task ID to complete" required>
-        <button type="submit" name="complete_task">Complete Task</button>
-    </form>
-    
-    <a href="{{ url_for('voice') }}">Voice-Assisted Task Management</a>
+    <a href="{{ url_for('voice') }}">Use Voice Commands</a>
 </body>
 </html>
